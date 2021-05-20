@@ -11,6 +11,8 @@ import re , os
 import json
 from jsonAnalyser import JA
 import html
+import pprint 
+from bs4 import BeautifulSoup
 
 class LPS(scrapy.Spider):
 	name='LPS'
@@ -21,6 +23,7 @@ class LPS(scrapy.Spider):
 		'DOWNLOAD_DELAY' : 0.25 ,
  		'COOKIES_ENABLED' : True,
 		'COOKIES_DEBUG' : True,
+		'SESSION_COOKIE_VALUE': 'AQEDASNTQzkBETY2AAABeYcXflwAAAF5qyQCXFYAVmetu67uQnTTo8J3',
 		'USER_AGENT':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
 	}
 
@@ -55,15 +58,40 @@ class LPS(scrapy.Spider):
 		#search between lines about dataJson line
 		done=False
 		nameOfProfile=response.url.split('/')[4]
+		# print('nameOfProfile: ', nameOfProfile)
 		for i in (response.text.split('\n')):
-			t=re.findall('\s+{&quot;data&quot;:{&quot;\*profile.*',i)
-			if (len(t)>0):
-				try:
-					t2=html.unescape(t[0])
-					dataJson=json.loads(t2)
-					done=True
-				except Exception as e: 
-					print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
+			# t=re.findall('\s+{&quot;data&quot;:{&quot;\*profile.*',i)
+			# print('i: ', i)
+			# print('len(t): ', len(t))
+			# if (len(t)>0):
+			# 	try:
+			# 		t2=html.unescape(t[0])
+			# 		dataJson=json.loads(t2)
+			# 		done=True
+			# 	except Exception as e: 
+			# 		print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
+			try:
+				data_json = json.loads(i)
+				# print("data_json: ", data_json)
+				print("data_json: ", json.dumps(data_json, indent=4, sort_keys=True))
+			except:
+				# print("data is not json")
+				soup = BeautifulSoup(i, "html.parser")
+				print(soup.prettify())
+			# if (
+			# 	len(re.findall('<code', i)) == 0 & 
+			# 	len(re.findall('/code>', i)) == 0 & 
+			# 	len(re.findall('<img', i)) == 0 
+			# ): 
+			# 	i = i.replace("&quot;", '"')
+			# 	# print(i)
+			# 	u=re.findall('Khaled Dallah',i)
+			# 	if (len(u)>0): 
+			# 		print(u)
+			# 		soup = BeautifulSoup(u, "html.parser")
+
+			# 		print(soup.prettify())
+
 		if(done):
 			print('\n... Profile : ',response.url)
 			print('\n... DONE')

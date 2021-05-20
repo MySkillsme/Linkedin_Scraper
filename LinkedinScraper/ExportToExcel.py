@@ -6,7 +6,7 @@
 
 
 from openpyxl import Workbook
-from openpyxl.compat import range
+# from openpyxl.compat import range
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill, Border
 from openpyxl.drawing.image import Image
@@ -104,15 +104,15 @@ class Ete :
 			if(shiftRow>=maxShiftRow):
 				maxShiftRow=shiftRow
 
-		#Shadow all rows that profile use
-		for rc in range(self.rowIndex+1, self.rowIndex+maxShiftRow+1):
-			for cc in range(len(self.ws1[rc])):
-				curcell=self.ws1.cell(column=cc+1, row=rc)
-				if(curcell.value):
-					continue
-				else:
-					curcell.fill=fill
-					curcell.border = border1
+		# #Shadow all rows that profile use
+		# for rc in range(self.rowIndex+1, self.rowIndex+maxShiftRow+1):
+		# 	for cc in range(len(self.ws1[rc])):
+		# 		curcell=self.ws1.cell(column=cc+1, row=rc)
+		# 		if(curcell.value):
+		# 			continue
+		# 		else:
+		# 			curcell.fill=fill
+		# 			curcell.border = border1
 
 		self.rowIndex+=1+maxShiftRow
 

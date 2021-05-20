@@ -20,6 +20,7 @@ class LS(scrapy.Spider):
 		'DOWNLOAD_DELAY' : 0.25 ,
  		'COOKIES_ENABLED' : True,
 		'COOKIES_DEBUG' : True,
+		'SESSION_COOKIE_VALUE': 'AQEDASNTQzkBETY2AAABeYcXflwAAAF5qyQCXFYAVmetu67uQnTTo8J3',
 		'USER_AGENT':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
 	}
 
