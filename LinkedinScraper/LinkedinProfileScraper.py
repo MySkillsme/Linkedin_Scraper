@@ -38,7 +38,7 @@ class LPS(scrapy.Spider):
 
 	def start_requests(self):
 		self.inheaders['csrf-token']=self.incookies['JSESSIONID']
-		print('\n... LPS cookies reached to LS : \n',self.incookies)
+		# print('\n... LPS cookies reached to LS : \n',self.incookies)
 		print('\n... LPS Request of LS Spider')
 		yield scrapy.Request(url=self.root_url,
 				cookies=self.incookies,
@@ -47,7 +47,7 @@ class LPS(scrapy.Spider):
 
 	def reqProfiles(self,response):
 		print('\n... LPS reqProfiles running')
-		print('\n... LPS profileUrls is \n',self.profileUrls)
+		# print('\n... LPS profileUrls is \n',self.profileUrls)
 		self.chechCacheDir()
 		for req in reversed(self.profileUrls[:self.numOfp]):
 			yield scrapy.Request(url=req,headers=self.inheaders,callback=self.parse)
@@ -60,24 +60,29 @@ class LPS(scrapy.Spider):
 		nameOfProfile=response.url.split('/')[4]
 		# print('nameOfProfile: ', nameOfProfile)
 		for i in (response.text.split('\n')):
-			# t=re.findall('\s+{&quot;data&quot;:{&quot;\*profile.*',i)
-			# print('i: ', i)
-			# print('len(t): ', len(t))
-			# if (len(t)>0):
-			# 	try:
-			# 		t2=html.unescape(t[0])
-			# 		dataJson=json.loads(t2)
-			# 		done=True
-			# 	except Exception as e: 
-			# 		print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
-			try:
-				data_json = json.loads(i)
-				# print("data_json: ", data_json)
-				print("data_json: ", json.dumps(data_json, indent=4, sort_keys=True))
-			except:
-				# print("data is not json")
-				soup = BeautifulSoup(i, "html.parser")
-				print(soup.prettify())
+			t=re.findall('\s+{&quot;data&quot;:{&quot;\*profile.*',i)
+			print('i: ', i)
+			print('len(t): ', len(t))
+			if (len(t)>0):
+				try:
+					t2=html.unescape(t[0])
+					dataJson=json.loads(t2)
+					
+					done=True
+				except Exception as e: 
+					print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
+			# try:
+			# 	dataJson = json.loads(i)
+			# 	done=True
+			# 	# print("data_json: ", data_json)
+			# 	# print("data_json: ", json.dumps(data_json, indent=4, sort_keys=True))
+			# except:
+			# 	# print("data is not json")
+			# 	soup = BeautifulSoup(i, "html.parser")
+			# 	dataJson=soup;
+			# 	done=True
+				# print(soup.prettify())
+
 			# if (
 			# 	len(re.findall('<code', i)) == 0 & 
 			# 	len(re.findall('/code>', i)) == 0 & 
@@ -93,11 +98,11 @@ class LPS(scrapy.Spider):
 			# 		print(soup.prettify())
 
 		if(done):
-			print('\n... Profile : ',response.url)
+			# print('\n... Profile : ',response.url)
 			print('\n... DONE')
 			self.parseImpData(dataJson,nameOfProfile)
 		else:
-			print('\n... Profile : ',response.url)
+			# print('\n... Profile : ',response.url)
 			print('\n!!! ERROR in find Data Section in Profile')
 
 
@@ -116,6 +121,7 @@ class LPS(scrapy.Spider):
 
 	#Get ImpData Of ImpSection Of Data
 	def parseImpData(self,dataJson,nameOfProfile):
+    	
 		sw={
 		'fs_profile':[{'firstName':'', 'lastName':'','summary':'', 'locationName':'', 'headline':''}],
 		'fs_position':[{'title':'', 'companyName':'', 'locationName':'' }],
@@ -129,6 +135,7 @@ class LPS(scrapy.Spider):
 		'fs_honor':[{'description':'', 'title':'', 'issuer':''}],
 		'fs_miniProfile':[{'picture':{},'firstName':''}]
 			}
+		print('-----------------------',self)
 		ja=JA(dataJson,nameOfProfile,sw)
 		ja.run()
 		FinalData=self.dataExtractor(ja.saveRes(),sw)

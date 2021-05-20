@@ -35,7 +35,7 @@ class LS(scrapy.Spider):
 
 	def start_requests(self):
 		self.inheaders['csrf-token']=self.incookies['JSESSIONID']
-		print('\n... cookies reached to LS : \n',self.incookies)
+		# print('\n... cookies reached to LS : \n',self.incookies)
 		print('\n... Request of LS Spider')
 		yield scrapy.Request(url=self.root_url,
 				cookies=self.incookies,
@@ -44,7 +44,7 @@ class LS(scrapy.Spider):
 
 	def reqRequests(self,response):
 		print('\n... reqRequests running')
-		print('\n... searchPageUrls is \n',self.searchPageUrls)
+		# print('\n... searchPageUrls is \n',self.searchPageUrls)
 		for req in reversed(self.searchPageUrls):
 			print('\n... req: ',req)
 			yield scrapy.Request(url=req,
@@ -64,10 +64,10 @@ class LS(scrapy.Spider):
 				try:
 					dataJson=json.loads(temp1)
 				except:
-					print(sys.exc_info())
-					print('\n!!! ERROR in make json from data of ',response.url)
+					# print(sys.exc_info())
+					# print('\n!!! ERROR in make json from data of ',response.url)
 					logFileName=self.outputFile+'.log'
-					print('log file of tha data in ',logFileName)
+					# print('log file of tha data in ',logFileName)
 					with open('cache/'+logFileName,'w+') as l:
 						l.write(temp1)
 					return(-1)
@@ -86,7 +86,7 @@ class LS(scrapy.Spider):
 					for j in elements1:
 						try:
 							tempUrl='https://www.linkedin.com/in/'+str(j["publicIdentifier"])
-							print(tempUrl)
+							# print(tempUrl)
 							self.profileUrls.append(tempUrl)
 							self.numParsedProfile+=1
 						except:
