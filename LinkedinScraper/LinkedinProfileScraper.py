@@ -58,53 +58,28 @@ class LPS(scrapy.Spider):
 		#search between lines about dataJson line
 		done=False
 		nameOfProfile=response.url.split('/')[4]
-		# print('nameOfProfile: ', nameOfProfile)
-		for i in (response.text.split('\n')):
-			t=re.findall('\s+{&quot;data&quot;:{&quot;\*profile.*',i)
-			print('i: ', i)
-			print('len(t): ', len(t))
-			if (len(t)>0):
-				try:
-					t2=html.unescape(t[0])
-					dataJson=json.loads(t2)
-					
-					done=True
-				except Exception as e: 
-					print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
-			# try:
-			# 	dataJson = json.loads(i)
-			# 	done=True
-			# 	# print("data_json: ", data_json)
-			# 	# print("data_json: ", json.dumps(data_json, indent=4, sort_keys=True))
-			# except:
-			# 	# print("data is not json")
-			# 	soup = BeautifulSoup(i, "html.parser")
-			# 	dataJson=soup;
-			# 	done=True
-				# print(soup.prettify())
-
-			# if (
-			# 	len(re.findall('<code', i)) == 0 & 
-			# 	len(re.findall('/code>', i)) == 0 & 
-			# 	len(re.findall('<img', i)) == 0 
-			# ): 
-			# 	i = i.replace("&quot;", '"')
-			# 	# print(i)
-			# 	u=re.findall('Khaled Dallah',i)
-			# 	if (len(u)>0): 
-			# 		print(u)
-			# 		soup = BeautifulSoup(u, "html.parser")
-
-			# 		print(soup.prettify())
-
+		res=[]
+		res=response.text.split('\n');
+		t=[];
+		for eachRow in res:
+    		
+			tes=re.findall('{&quot;data&quot;',eachRow)
+			if (len(tes)>0):
+					try:
+						t2=html.unescape(tes[0])
+						print('t2 works',t2)
+						dataJson=json.loads(t2)
+						done=True
+					except Exception as e: 
+						print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
 		if(done):
-			# print('\n... Profile : ',response.url)
-			print('\n... DONE')
+
 			self.parseImpData(dataJson,nameOfProfile)
 		else:
-			# print('\n... Profile : ',response.url)
+			print('\n... Profile : ',response.url)
 			print('\n!!! ERROR in find Data Section in Profile')
 
+    					
 
 
 	#Save Json file of jsonData
