@@ -59,22 +59,94 @@ class LPS(scrapy.Spider):
 		done=False
 		nameOfProfile=response.url.split('/')[4]
 		res=[]
-		res=response.text.split('\n');
+		strr=response.text;
+		# with open('readme1.txt', 'w') as f:
+    	# 		f.write(strr)
+		str22=strr.replace("&quot;", "'")
+		res=str22.split('\n');
+		# print('________________________',type(str22))
+		# for eachRow in res:
+		# 		eachRow.replace('&quot;', "'")
 		t=[];
-		for eachRow in res:
-    		
-			tes=re.findall('{&quot;data&quot;',eachRow)
-			if (len(tes)>0):
-					try:
-						t2=html.unescape(tes[0])
-						print('t2 works',t2)
-						dataJson=json.loads(t2)
-						done=True
-					except Exception as e: 
-						print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
+		countnumber=0
+		schoolArray=[]
+		companyArray=[]
+		mySkills=[]
+		userProfile={
+			# 'firstName':'',
+			# 'LastName':'',
+			# 'headLine':'',
+			# 'summary':''
+		}
+		# with open('readme2.txt', 'w') as f:
+    	# 		f.write(str22)
+		tes=str22.split('class="datalet-bpr-guid')
+		try:
+			lengthArray=len(tes)
+			data1=tes[12].split('>')
+			data2=data1[2].replace('</code','')
+			data3=data2.replace('\n',"")
+			data4=data3.replace("'",'"')
+			dataJson=json.loads(data4)
+			
+			# print('t2 works',tes[12])
+			for arrayObj in dataJson["included"]:
+    				# print('________________________',arrayObj)
+					if 'schoolName' in arrayObj:
+    						# print('_-------------------',arrayObj)
+							schoolArray.append({
+								'schoolName':arrayObj['schoolName'],
+								'degree':arrayObj['degreeName'],
+								'field':arrayObj['fieldOfStudy'],
+								'description':arrayObj['description'],
+								'startYear':arrayObj['dateRange']['start']['year'],
+								'endYear':arrayObj['dateRange']['end']['year'],
+							})
+					if 'companyUrn' in arrayObj and 'title' in arrayObj:
+    						# print('_-------------------',arrayObj)
+							company={}
+							company={
+								'companyName':arrayObj['companyName'],
+								'position':arrayObj['title'],
+								'startMonth':arrayObj['dateRange']['start']['month'],
+								'startYear':arrayObj['dateRange']['start']['year'],
+								'location':arrayObj['locationName']
+							}
+							if 'end' in arrayObj['dateRange']:
+    								company['endMonth']=arrayObj['dateRange']['end']['month']
+    								company['endYear']=arrayObj['dateRange']['end']['year']
+							companyArray.append(company)
+							
+
+					if '$type' in arrayObj:
+    						if arrayObj["$type"]=="com.linkedin.voyager.dash.identity.profile.Skill":
+    								mySkills.append({
+										'name':arrayObj["name"]
+									})
+					if 'firstName' in arrayObj:
+    						# if arrayObj["$type"]=="com.linkedin.voyager.dash.identity.profile.Skill":
+    						userProfile['firstName']=arrayObj['firstName']
+    						userProfile['lastName']=arrayObj['lastName']
+    						userProfile['summary']=arrayObj['summary']
+    						userProfile['headline']=arrayObj['headline']
+									# mySkills.append(arrayObj)
+    							# print('_-------------------',arrayObj)
+
+
+			# t2=html.unescape(tes[lengthArray-2])
+			userProfile['experience']=companyArray
+			userProfile['education']=schoolArray
+			userProfile['skills']=mySkills
+			print('---------general---------',userProfile)
+			dataJson=userProfile
+			done=True
+
+		except Exception as e: 
+			print("\n!!! ERROR in json loads DATA to dataJson :\n",e)
 		if(done):
 
-			self.parseImpData(dataJson,nameOfProfile)
+			# self.parseImpData(dataJson,nameOfProfile)
+			self.saveJsonFile(nameOfProfile+'_new.json',dataJson)
 		else:
 			print('\n... Profile : ',response.url)
 			print('\n!!! ERROR in find Data Section in Profile')
@@ -84,7 +156,7 @@ class LPS(scrapy.Spider):
 
 	#Save Json file of jsonData
 	def saveJsonFile(self,name,dataJson):
-		directory='cache'
+		directory='Output'
 		filePath='/'.join([directory,name])
 		with open(filePath, "w+") as json_file:
 			try:
